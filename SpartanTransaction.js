@@ -15,5 +15,6 @@ module.exports = class SpartanTransaction extends Transaction {
     typeOfTx(){
         return this.data.typeOfTx;
     }
- 
+    
+    
 }
