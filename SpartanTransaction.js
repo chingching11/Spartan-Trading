@@ -32,26 +32,21 @@ module.exports = class SpartanTransaction extends Transaction {
    * @param [obj.data] - Object with any additional properties desired for the transaction.
    */
     constructor({txType, from, nonce, pubKey, sig, outputs, fee=0, data={}}) {
+        super({txType, from, nonce, pubKey, sig, outputs, fee, data})
         this.txType = txType;
-        this.from = from;
-        this.nonce = nonce;
-        this.pubKey = pubKey;
-        this.sig = sig;
-        this.fee = fee;
-        this.outputs = [];
-        if(txType === NORMAL_TX) {
-            if (outputs) {
-                outputs.forEach(({amount, address}) => {
-                    if (typeof amount !== 'number') {
-                      amount = parseInt(amount, 10);
-                    }
-                    this.outputs.push({amount, address});
-                });
-            }
-        } else {
-            this.outputs = outputs;
-        }        
-        this.data = data;
+        // if(txType === NORMAL_TX) {
+        //     if (outputs) {
+        //         outputs.forEach(({amount, address}) => {
+        //             if (typeof amount !== 'number') {
+        //               amount = parseInt(amount, 10);
+        //             }
+        //             this.outputs.push({amount, address});
+        //         });
+        //     }
+        // } else {
+        //     this.outputs = outputs;
+        // }        
+        // this.data = data;
       }
 
     typeOfTx(){

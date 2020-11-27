@@ -1,9 +1,8 @@
 "use strict";
-const { Block} = require("spartan-gold");
+const { Block, Blockchain} = require("spartan-gold");
 const OWNERSHIP_REGISTRY = "reigster_ownership"
 const TRADING_PROPERTY = "trading_property"
-const NORMAL_TX = "sending_money"
-
+const NORMAL_TX = "sending_spartanGold_money"
 module.exports = class SpartanBlock extends Block {
 
     // modify addTx: in check conditions
@@ -21,44 +20,18 @@ module.exports = class SpartanBlock extends Block {
    *      produces a smaller value when hashed.
    * @param {Number} [coinbaseReward] - The gold that a miner earns for finding a block proof.
    */
-    constructor(rewardAddr, prevBlock, target=Blockchain.POW_TARGET, coinbaseReward=Blockchain.COINBASE_AMT_ALLOWED) {
-        this.prevBlockHash = prevBlock ? prevBlock.hashVal() : null;
-        this.target = target;
-    
-        // Get the balances and nonces from the previous block, if available.
-        // Note that balances and nonces are NOT part of the serialized format.
-        this.balances = prevBlock ? new Map(prevBlock.balances) : new Map();
-        this.nextNonce = prevBlock ? new Map(prevBlock.nextNonce) : new Map();
+    constructor(rewardAddr, prevBlock, target=Blockchain.POW_TARGET, coinbaseReward=Blockchain.COINBASE_AMT_ALLOWED){
+        super(rewardAddr, prevBlock, target=Blockchain.POW_TARGET, coinbaseReward=Blockchain.COINBASE_AMT_ALLOWED)
+         // get the properties from the previous block (houseId --> ownerId)
+         this.properties = prevBlock ? new Map(prevBlock.properties) : new Map();
+         // Get the client's owned properties (ownerId --> [properties])
+         this.owners = prevBlock ? new Map(prevBlock.owners) : new Map();
 
-        // get the properties from the previous block (houseId --> ownerId)
-        this.properties = prevBlock ? new Map(prevBlock.properties) : new Map();
-        // Get the client's owned properties (ownerId --> [properties])
-        this.owners = prevBlock ? new Map(prevBlock.owners) : new Map();
-    
-        if (prevBlock && prevBlock.rewardAddr) {
-          // Add the previous block's rewards to the miner who found the proof.
-          let winnerBalance = this.balanceOf(prevBlock.rewardAddr) || 0;
-          this.balances.set(prevBlock.rewardAddr, winnerBalance + prevBlock.totalRewards());
-        }
-    
-        // Storing transactions in a Map to preserve key order.
-        this.transactions = new Map();
-        
-        // Used to determine the winner between competing chains.
-        // Note that this is a little simplistic -- an attacker
-        // could make a long, but low-work chain.  However, this works
-        // well enough for us.
-        this.chainLength = prevBlock ? prevBlock.chainLength+1 : 0;
-    
-        this.timestamp = Date.now();
-    
-        // The address that will gain both the coinbase reward and transaction fees,
-        // assuming that the block is accepted by the network.
-        this.rewardAddr = rewardAddr;
-    
-        this.coinbaseReward = coinbaseReward;
-      }
+    }
 
+    ownerOf(addr){
+        return this.owners.get(addr) || 0;
+    }
     /**
      * Accepts 3 types of tx: normal tx, register ownership, trading 
      * @param {*} tx 
@@ -77,7 +50,7 @@ module.exports = class SpartanBlock extends Block {
           } else if (!tx.validSignature()) {
             if (client) client.log(`Invalid signature for transaction ${tx.id}.`);
             return false;
-          } else if (!tx.sufficientFunds(this)) {
+          } else if (tx.txType === NORMAL_TX && !tx.sufficientFunds(this)) {
             if (client) client.log(`Insufficient gold for transaction ${tx.id}.`);
             return false;
           }
@@ -98,18 +71,49 @@ module.exports = class SpartanBlock extends Block {
 
           // Adding the transaction to the block
           this.transactions.set(tx.id, tx);
-      
-          // Taking gold from the sender
-          let senderBalance = this.balanceOf(tx.from);
-          this.balances.set(tx.from, senderBalance - tx.totalOutput());
-      
-          // Giving gold to the specified output addresses
-          tx.outputs.forEach(({amount, address}) => {
-            let oldBalance = this.balanceOf(address);
-            this.balances.set(address, amount + oldBalance);
-          });
-      
+          console.log(tx.txType);
+          if(tx.txType === NORMAL_TX){
+            // Taking gold from the sender
+            let senderBalance = this.balanceOf(tx.from);
+            this.balances.set(tx.from, senderBalance - tx.totalOutput());
+        
+            // Giving gold to the specified output addresses
+            tx.outputs.forEach(({amount, address}) => {
+                let oldBalance = this.balanceOf(address);
+                this.balances.set(address, amount + oldBalance);
+            });
+          } else if(tx.txType === OWNERSHIP_REGISTRY) {
+              this.properties.set(tx.data.propertyId, tx.data.address);
+              this.owners.set(tx.data.address, tx.data.propertyId);
+              console.log("hey hey hey");
+          }
+          
+          console.log(this.owners);
+          console.log(`Hey owner ${tx.data.address} property is `  + this.ownerOf(tx.data.address));
           return true;
     }
+
+    rerun(prevBlock) {
+        // Setting balances to the previous block's balances.
+        this.balances = new Map(prevBlock.balances);
+        this.nextNonce = new Map(prevBlock.nextNonce);
+        this.owners = new Map(prevBlock.owners)
+        this.properties = new Map(prevBlock.properties)
+    
+        // Adding coinbase reward for prevBlock.
+        let winnerBalance = this.balanceOf(prevBlock.rewardAddr);
+        if (prevBlock.rewardAddr) this.balances.set(prevBlock.rewardAddr, winnerBalance + prevBlock.totalRewards());
+
+
+        // Re-adding all transactions.
+        let txs = this.transactions;
+        this.transactions = new Map();
+        for (let tx of txs.values()) {
+          let success = this.addTransaction(tx);
+          if (!success) return false;
+        }
+    
+        return true;
+      }
 
 }

@@ -10,11 +10,10 @@ module.exports = class House {
      * @param {Float} price - price at which seller wants to sells the house 
      * @param {String} ownerAddr - address of the owner 
      */
-    constructor({geoCoordinates, physicalAddr, price}){
+    constructor(geoCoordinates, physicalAddr, price){
         this.geoCoordinates = geoCoordinates
         this.physicalAddr = physicalAddr
         this.price = price
-        // this.ownerAddr = ownerAddr
     }
 
      /** 
@@ -29,9 +28,9 @@ module.exports = class House {
         }));
     }
 
-    get price(){
-        return this.price
-    }
+    // get price(){
+    //     return this.price
+    // }
 
     /**
      * 
