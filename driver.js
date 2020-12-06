@@ -27,7 +27,7 @@ let genesis = Blockchain.makeGenesis({
   clientBalanceMap: new Map([
     [alice, 233],
     [bob, 99],
-    [charlie, 67],
+    [charlie, 600],
     [minnie, 400],
     [mickey, 300],
   ]),
@@ -68,28 +68,30 @@ mickey.initialize();
 console.log(`Alice is transferring 40 gold to ${bob.address}`);
 alice.postTransaction(Transaction.NORMAL_TX, [{ amount: 40, address: bob.address }]);
 
-// console.log(`Alice is transferring 40 gold to ${bob.address}`);
-// alice.postTransaction(Transaction.NORMAL_TX, [{ amount: 1000, address: bob.address }]);
-
 let h1 = new House ({latitude: 38.89, longitude: -77.03, physicalAddr: "123 abc street", price: 500})
 
 let h2 = new House ({latitude: 16.87, longitude: 96.199, physicalAddr: "66 Sint Oo Dan Street", price: 1000})
 
 // Bob registering 
-console.log(`Bob registering ownership, ${bob.address}, ${h1.hashID}`);
-bob.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: h1.hashID , address: bob.address})
+console.log(`Bob registering ownership, ${h1.hashID}`);
+bob.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: h1.hashID , address: bob.address, price: h1.price})
 
 // Alice registering 
-console.log(`Alice registering ownership, ${alice.address}, ${h2.hashID}`);
-bob.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: h2.hashID , address: alice.address})
+console.log(`Alice registering ownership, ${h2.hashID}`);
+alice.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: h2.hashID , address: alice.address, price: h2.price})
 
-// Charlie registering Bob's property
-console.log(`Charlie registering ownership, ${charlie.address}, ${h1.hashID} `);
-bob.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: h1.hashID , address: charlie.address})
+// Charlie buying Bob's property
+console.log(`Bob transferring ownership to Charlie, ${h1.hashID}`);
+charlie.postTransaction(Transaction.TRADING_PROPERTY, [{ amount: h1.price, address: bob.address }], {propertyId: h1.hashID, address: charlie.address, price: h1.price})
 
-// Charlie registering non-existent property
-console.log(`Charlie registering ownership, ${charlie.address}`);
-charlie.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: "ace45b03e82849e2dfe368ba4c2c6c3fb89d4eca0602f7bd0a010229563e9539", address: charlie.address})
+
+// // Charlie registering Bob's property
+// console.log(`Charlie registering ownership, ${h1.hashID} `);
+// bob.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: h1.hashID , address: charlie.address})
+
+// // Charlie registering non-existent property
+// console.log(`Charlie registering ownership, ace45b03e82849e2dfe368ba4c2c6c3fb89d4eca0602f7bd0a010229563e9539`);
+// charlie.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: "ace45b03e82849e2dfe368ba4c2c6c3fb89d4eca0602f7bd0a010229563e9539", address: charlie.address})
 
 setTimeout(() => {
   console.log();

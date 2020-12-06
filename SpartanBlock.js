@@ -1,10 +1,8 @@
 "use strict";
 const { Block, Blockchain} = require("spartan-gold");
-// const OWNERSHIP_REGISTRY = "reigster_ownership"
-// const TRADING_PROPERTY = "trading_property"
-// const NORMAL_TX = "sending_spartanGold_money"
 const existInList = require("./RegisterOwnership")
 const Transaction = require ("./SpartanTransaction")
+const TradingContract = require("./TradingContract")
 
 module.exports = class SpartanBlock extends Block {
 
@@ -29,6 +27,8 @@ module.exports = class SpartanBlock extends Block {
          this.properties = prevBlock ? new Map(prevBlock.properties) : new Map();
          // Get the client's owned properties (ownerId --> [properties])
          this.owners = prevBlock ? new Map(prevBlock.owners) : new Map();
+         // get each property price (propertyId --> price)
+         this.prices =  prevBlock ? new Map(prevBlock.prices) : new Map();
 
     }
 
@@ -55,18 +55,26 @@ module.exports = class SpartanBlock extends Block {
           } else if (!tx.validSignature()) {
             if (client) client.log(`Invalid signature for transaction ${tx.id}.`);
             return false;
-          } else if (tx.txType === Transaction.NORMAL_TX && !tx.sufficientFunds(this)) {
+          } else if ((tx.txType === Transaction.NORMAL_TX || tx.txType === Transaction.TRADING_PROPERTY) && !tx.sufficientFunds(this)) {
             if (client) client.log(`Insufficient gold for transaction ${tx.id}.`);
             return false;
           } else if (tx.txType === Transaction.OWNERSHIP_REGISTRY) {
+            // check if the property has been claimed
               if (!tx.alreadyClaimedProperty(this, tx.data.propertyId)) {
-                client.log(`The property is already claimed by someone.`);
+                client.log(`The property ${tx.data.propertyId} is already claimed by someone.`);
                 return false
               }
+              // check if the property really exists
               if (!existInList(tx.data.propertyId)) {
-                client.log(`The property doesn't exist.`);
+                client.log(`The property ${tx.data.propertyId} doesn't exist.`);
                 return false 
               }             
+          } else if (tx.txType === Transaction.TRADING_PROPERTY){
+              let c = new TradingContract(this)
+              if (!c.transferOwnership(tx.outputs[0].address, tx.data.propertyId)){
+                console.log(`Something is wrong with this trading.`)
+                return false
+              }           
           }
 
           // Checking and updating nonce value.
@@ -86,7 +94,7 @@ module.exports = class SpartanBlock extends Block {
           // Adding the transaction to the block
           this.transactions.set(tx.id, tx);
 
-          if(tx.txType === Transaction.NORMAL_TX){
+          if(tx.txType === Transaction.NORMAL_TX || tx.txType === Transaction.TRADING_PROPERTY){
             // Taking gold from the sender
             let senderBalance = this.balanceOf(tx.from);
             this.balances.set(tx.from, senderBalance - tx.totalOutput());
@@ -96,9 +104,11 @@ module.exports = class SpartanBlock extends Block {
                 let oldBalance = this.balanceOf(address);
                 this.balances.set(address, amount + oldBalance);
             });
-          } else if(tx.txType === Transaction.OWNERSHIP_REGISTRY) {
+          } 
+          if(tx.txType === Transaction.OWNERSHIP_REGISTRY || tx.txType === Transaction.TRADING_PROPERTY) {
               this.properties.set(tx.data.propertyId, tx.data.address);
               this.owners.set(tx.data.address, tx.data.propertyId);
+              this.prices.set(tx.data.propertyId, tx.data.price)
           }
           return true;
     }

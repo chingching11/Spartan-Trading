@@ -30,9 +30,6 @@ module.exports = class House {
         }));
     }
 
-    // get price(){
-    //     return this.price
-    // }
 
     /**
      * 
