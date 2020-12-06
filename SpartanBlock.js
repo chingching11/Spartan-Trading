@@ -1,8 +1,11 @@
 "use strict";
 const { Block, Blockchain} = require("spartan-gold");
-const OWNERSHIP_REGISTRY = "reigster_ownership"
-const TRADING_PROPERTY = "trading_property"
-const NORMAL_TX = "sending_spartanGold_money"
+// const OWNERSHIP_REGISTRY = "reigster_ownership"
+// const TRADING_PROPERTY = "trading_property"
+// const NORMAL_TX = "sending_spartanGold_money"
+const existInList = require("./RegisterOwnership")
+const Transaction = require ("./SpartanTransaction")
+
 module.exports = class SpartanBlock extends Block {
 
     // modify addTx: in check conditions
@@ -29,8 +32,10 @@ module.exports = class SpartanBlock extends Block {
 
     }
 
+
+
     ownerOf(addr){
-        return this.owners.get(addr) || 0;
+        return this.owners.get(addr) || "nothing";
     }
     /**
      * Accepts 3 types of tx: normal tx, register ownership, trading 
@@ -50,11 +55,20 @@ module.exports = class SpartanBlock extends Block {
           } else if (!tx.validSignature()) {
             if (client) client.log(`Invalid signature for transaction ${tx.id}.`);
             return false;
-          } else if (tx.txType === NORMAL_TX && !tx.sufficientFunds(this)) {
+          } else if (tx.txType === Transaction.NORMAL_TX && !tx.sufficientFunds(this)) {
             if (client) client.log(`Insufficient gold for transaction ${tx.id}.`);
             return false;
+          } else if (tx.txType === Transaction.OWNERSHIP_REGISTRY) {
+              if (!tx.alreadyClaimedProperty(this, tx.data.propertyId)) {
+                client.log(`The property is already claimed by someone.`);
+                return false
+              }
+              if (!existInList(tx.data.propertyId)) {
+                client.log(`The property doesn't exist.`);
+                return false 
+              }             
           }
-      
+
           // Checking and updating nonce value.
           // This portion prevents replay attacks.
           let nonce = this.nextNonce.get(tx.from) || 0;
@@ -71,8 +85,8 @@ module.exports = class SpartanBlock extends Block {
 
           // Adding the transaction to the block
           this.transactions.set(tx.id, tx);
-          console.log(tx.txType);
-          if(tx.txType === NORMAL_TX){
+
+          if(tx.txType === Transaction.NORMAL_TX){
             // Taking gold from the sender
             let senderBalance = this.balanceOf(tx.from);
             this.balances.set(tx.from, senderBalance - tx.totalOutput());
@@ -82,14 +96,10 @@ module.exports = class SpartanBlock extends Block {
                 let oldBalance = this.balanceOf(address);
                 this.balances.set(address, amount + oldBalance);
             });
-          } else if(tx.txType === OWNERSHIP_REGISTRY) {
+          } else if(tx.txType === Transaction.OWNERSHIP_REGISTRY) {
               this.properties.set(tx.data.propertyId, tx.data.address);
               this.owners.set(tx.data.address, tx.data.propertyId);
-              console.log("hey hey hey");
           }
-          
-          console.log(this.owners);
-          console.log(`Hey owner ${tx.data.address} property is `  + this.ownerOf(tx.data.address));
           return true;
     }
 
@@ -97,6 +107,7 @@ module.exports = class SpartanBlock extends Block {
         // Setting balances to the previous block's balances.
         this.balances = new Map(prevBlock.balances);
         this.nextNonce = new Map(prevBlock.nextNonce);
+        // Setting owners and properties to the previous block's owners and properties
         this.owners = new Map(prevBlock.owners)
         this.properties = new Map(prevBlock.properties)
     

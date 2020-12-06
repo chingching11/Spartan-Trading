@@ -9,6 +9,12 @@ const NORMAL_TX = "sending_spartanGold_money"
 
 module.exports = class SpartanTransaction extends Transaction {
     
+  static get OWNERSHIP_REGISTRY() { return OWNERSHIP_REGISTRY}
+
+  static get TRADING_PROPERTY() { return TRADING_PROPERTY}
+  
+  static get NORMAL_TX() { return NORMAL_TX }
+
 /**
    * There can be 3 types of outputs depending on 3 types of transactions
    * for normal tx: 
@@ -34,24 +40,19 @@ module.exports = class SpartanTransaction extends Transaction {
     constructor({txType, from, nonce, pubKey, sig, outputs, fee=0, data={}}) {
         super({txType, from, nonce, pubKey, sig, outputs, fee, data})
         this.txType = txType;
-        // if(txType === NORMAL_TX) {
-        //     if (outputs) {
-        //         outputs.forEach(({amount, address}) => {
-        //             if (typeof amount !== 'number') {
-        //               amount = parseInt(amount, 10);
-        //             }
-        //             this.outputs.push({amount, address});
-        //         });
-        //     }
-        // } else {
-        //     this.outputs = outputs;
-        // }        
-        // this.data = data;
       }
 
     typeOfTx(){
         return this.txType;
     }
+
+    alreadyClaimedProperty(block, propertyId) {
+      if(block.properties.get(propertyId)){
+        return false;
+      } 
+      return true;
+    }
+
     
     
 }

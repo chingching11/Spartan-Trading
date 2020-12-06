@@ -1,10 +1,8 @@
-"use strict";
-
 const { Blockchain, Miner, FakeNet } = require("spartan-gold");
 let Block = require('./SpartanBlock.js');
 let Client = require('./SpartanClient.js');
 let Transaction = require('./SpartanTransaction.js');
-let House = require('./House.js')
+
 
 console.log("Starting simulation.  This may take a moment...");
 
@@ -45,14 +43,6 @@ function showBalances(client) {
   console.log(`Mickey has ${client.lastBlock.balanceOf(mickey.address)} gold.`);
   console.log(`Donald has ${client.lastBlock.balanceOf(donald.address)} gold.`);
 }
-function showProperties(client) {
-    console.log(`Alice has ${client.lastBlock.ownerOf(alice.address)}`);
-    console.log(`Bob has ${client.lastBlock.ownerOf(bob.address)}`);
-    console.log(`Charlie has ${client.lastBlock.ownerOf(charlie.address)}`);
-    console.log(`Minnie has ${client.lastBlock.ownerOf(minnie.address)}`);
-    console.log(`Mickey has ${client.lastBlock.ownerOf(mickey.address)}`);
-    console.log(`Donald has ${client.lastBlock.ownerOf(donald.address)}`);
-}
 
 // Showing the initial balances from Alice's perspective, for no particular reason.
 console.log("Initial balances:");
@@ -66,30 +56,19 @@ mickey.initialize();
 
 // Alice transfers some money to Bob.
 console.log(`Alice is transferring 40 gold to ${bob.address}`);
-alice.postTransaction(Transaction.NORMAL_TX, [{ amount: 40, address: bob.address }]);
+alice.postTransaction(Transaction.NORMAL_TX,[{ amount: 40, address: bob.address }]);
 
-// console.log(`Alice is transferring 40 gold to ${bob.address}`);
-// alice.postTransaction(Transaction.NORMAL_TX, [{ amount: 1000, address: bob.address }]);
+// Alice transfers more than she has to Bob.
+console.log(`Alice is transferring 400 gold to ${bob.address}`);
+alice.postTransaction(Transaction.NORMAL_TX,[{ amount: 400, address: bob.address }]);
 
-let h1 = new House ({latitude: 38.89, longitude: -77.03, physicalAddr: "123 abc street", price: 500})
+//Bob transfers more than he has to charlie.
+console.log(`Bob is transferring 39 gold to ${charlie.address}`);
+bob.postTransaction(Transaction.NORMAL_TX,[{ amount: 39, address: charlie.address }]);
 
-let h2 = new House ({latitude: 16.87, longitude: 96.199, physicalAddr: "66 Sint Oo Dan Street", price: 1000})
-
-// Bob registering 
-console.log(`Bob registering ownership, ${bob.address}, ${h1.hashID}`);
-bob.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: h1.hashID , address: bob.address})
-
-// Alice registering 
-console.log(`Alice registering ownership, ${alice.address}, ${h2.hashID}`);
-bob.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: h2.hashID , address: alice.address})
-
-// Charlie registering Bob's property
-console.log(`Charlie registering ownership, ${charlie.address}, ${h1.hashID} `);
-bob.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: h1.hashID , address: charlie.address})
-
-// Charlie registering non-existent property
-console.log(`Charlie registering ownership, ${charlie.address}`);
-charlie.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: "ace45b03e82849e2dfe368ba4c2c6c3fb89d4eca0602f7bd0a010229563e9539", address: charlie.address})
+// Charlie transfers more than he has to Bob
+console.log(`Charlie is transferring 400 gold to ${bob.address}`);
+charlie.postTransaction(Transaction.NORMAL_TX,[{ amount: 400, address: bob.address }]);
 
 setTimeout(() => {
   console.log();
@@ -122,16 +101,5 @@ setTimeout(() => {
   console.log("Final balances (Donald's perspective):");
   showBalances(donald);
 
-  console.log();
-  console.log("Final properties (Minnie's perspective):");
-  showProperties(minnie);
-
-  console.log();
-  console.log("Final properties (Alice's perspective):");
-  showProperties(alice);
-
-  console.log();
-  console.log("Final properties (Donald's perspective):");
-  showProperties(donald);
   process.exit(0);
 }, 5000);

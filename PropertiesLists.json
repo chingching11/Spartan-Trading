@@ -1,0 +1,20 @@
+[
+    {
+        "latitude": 38.89,
+        "longitude": -77.03,
+        "physicalAddr": "123 abc street",
+        "price": 500
+    }, 
+    {
+        "latitude": 50.01,
+        "longitude": 85.60,
+        "physicalAddr": "oh my street",
+        "price": 700
+    }, 
+    {
+        "latitude": 16.87,
+        "longitude": 96.199,
+        "physicalAddr": "66 Sint Oo Dan Street",
+        "price": 1000
+    }
+]

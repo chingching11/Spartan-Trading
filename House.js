@@ -10,8 +10,9 @@ module.exports = class House {
      * @param {Float} price - price at which seller wants to sells the house 
      * @param {String} ownerAddr - address of the owner 
      */
-    constructor(geoCoordinates, physicalAddr, price){
-        this.geoCoordinates = geoCoordinates
+    constructor({latitude, longitude,  physicalAddr, price}){
+        this.latitude = latitude
+        this.longitude = longitude
         this.physicalAddr = physicalAddr
         this.price = price
     }
@@ -21,9 +22,10 @@ module.exports = class House {
       */
     get hashID(){
         return utils.hash(HOUSE_CONST + JSON.stringify({
-            geoCoordinates: this.geoCoordinates,
+            latitude: this.latitude,
+            longitude: this.longitude,
             physicalAddr: this.physicalAddr,
-            // price: this.price,
+            price: this.price,
             // ownerAddr: this.ownerAddr
         }));
     }
