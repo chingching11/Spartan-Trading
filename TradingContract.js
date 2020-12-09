@@ -10,10 +10,16 @@ const Transaction = require('./SpartanTransaction')
 
 module.exports = class TradingContract{
 
-    constructor(block){
+    constructor(block, owner, price, propertyId, sufficientFund){
         this.block = block;
         this.properties = block.properties;
+        this.prices = block.prices;
         this.owners = block.owners;
+
+        this.owner = owner
+        this.price = price
+        this.propertyId = propertyId
+        this.sufficientFund = sufficientFund
     }
 
     ownerOf(propertyId){
@@ -21,20 +27,36 @@ module.exports = class TradingContract{
     }
 
     // get 'to' from tx.outputs
-    transferOwnership(owner, propertyId){
+    transferOwnership(){
         // check if the property is registered
-        if(!this.properties.get(propertyId)){
+        if(!this.properties.get(this.propertyId)){
             console.log("hey not registered");
+            // throw "hey not registered"
             return false 
         }
-        // check if the owner is the same as 'from' address
-        if(this.owners.get(owner) !== propertyId){
+        // check if the owner is the same 
+        if(this.properties.get(this.propertyId) !== this.owner){
             console.log("owner not same")
+            // throw "owner not same"
             return false
         }
+
+        // check if the price is the same
+        if(this.prices.get(this.propertyId) !== this.price){
+            console.log("price not the same")
+            // throw "price not same"
+            return false
+        }
+
+        // check if the buyer has enough gold to buy 
+        if(this.sufficientFund === false){
+            // throw "not enough money"
+            console.log("The buyer doen't have enough to buy")
+            return false
+        }
+
         // delete the ownership of buyer
-        this.properties.delete(propertyId)
-        this.owners.delete(owner)
+        this.properties.delete(this.propertyId)
         return true;
     }
 

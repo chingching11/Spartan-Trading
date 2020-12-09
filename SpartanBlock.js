@@ -39,7 +39,7 @@ module.exports = class SpartanBlock extends Block {
           r.push(property)
         }
     }
-        return r.length >0 ? this.owners.get(addr) : "nothing";
+        return r.length > 0 ? r : "nothing";
     }
     /**
      * Accepts 3 types of tx: normal tx, register ownership, trading 
