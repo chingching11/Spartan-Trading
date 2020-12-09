@@ -120,6 +120,7 @@ module.exports = class SpartanBlock extends Block {
         // Setting owners and properties to the previous block's owners and properties
         this.owners = new Map(prevBlock.owners)
         this.properties = new Map(prevBlock.properties)
+        this.prices = new Map(prevBlock.prices)
     
         // Adding coinbase reward for prevBlock.
         let winnerBalance = this.balanceOf(prevBlock.rewardAddr);

@@ -119,6 +119,11 @@ setTimeout(() => {
   console.log();
   console.log("Final balances (Alice's perspective):");
   showBalances(alice);
+  alice.showWallet();
+  console.log();
+  charlie.showWallet();
+  bob.showWallet();
+ 
 
   console.log();
   console.log("Final balances (Donald's perspective):");
@@ -135,5 +140,7 @@ setTimeout(() => {
   console.log();
   console.log("Final properties (Donald's perspective):");
   showProperties(donald);
+  
   process.exit(0);
 }, 5000);
+
