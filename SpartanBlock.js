@@ -25,8 +25,6 @@ module.exports = class SpartanBlock extends Block {
         super(rewardAddr, prevBlock, target=Blockchain.POW_TARGET, coinbaseReward=Blockchain.COINBASE_AMT_ALLOWED)
          // get the properties from the previous block (houseId --> ownerId)
          this.properties = prevBlock ? new Map(prevBlock.properties) : new Map();
-         // Get the client's owned properties (ownerId --> [properties])
-         this.owners = prevBlock ? new Map(prevBlock.owners) : new Map();
          // get each property price (propertyId --> price)
          this.prices =  prevBlock ? new Map(prevBlock.prices) : new Map();
 
@@ -35,7 +33,13 @@ module.exports = class SpartanBlock extends Block {
 
 
     ownerOf(addr){
-        return this.owners.get(addr) || "nothing";
+      let r = []
+      for (let [property, id] of this.properties) {
+        if(id === addr){
+          r.push(property)
+        }
+    }
+        return r.length >0 ? this.owners.get(addr) : "nothing";
     }
     /**
      * Accepts 3 types of tx: normal tx, register ownership, trading 
@@ -106,8 +110,7 @@ module.exports = class SpartanBlock extends Block {
             });
           } 
           if(tx.txType === Transaction.OWNERSHIP_REGISTRY || tx.txType === Transaction.TRADING_PROPERTY) {
-              this.properties.set(tx.data.propertyId, tx.data.address);
-              this.owners.set(tx.data.address, tx.data.propertyId);
+              this.properties.set(tx.data.propertyId, tx.from);
               this.prices.set(tx.data.propertyId, tx.data.price)
           }
           return true;
@@ -118,7 +121,6 @@ module.exports = class SpartanBlock extends Block {
         this.balances = new Map(prevBlock.balances);
         this.nextNonce = new Map(prevBlock.nextNonce);
         // Setting owners and properties to the previous block's owners and properties
-        this.owners = new Map(prevBlock.owners)
         this.properties = new Map(prevBlock.properties)
         this.prices = new Map(prevBlock.prices)
     
