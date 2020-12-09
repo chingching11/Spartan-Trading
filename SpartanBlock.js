@@ -1,6 +1,6 @@
 "use strict";
 const { Block, Blockchain} = require("spartan-gold");
-const existInList = require("./RegisterOwnership")
+const RegisterOwnership = require("./RegisterOwnership")
 const Transaction = require ("./SpartanTransaction")
 const TradingContract = require("./TradingContract")
 
@@ -48,38 +48,29 @@ module.exports = class SpartanBlock extends Block {
      * 
      * @returns {Boolean}
      */
-    // Needs to be updated!!!!!!!!! to accept other txs
+ 
     addTransaction(tx, client){
-        if (this.transactions.get(tx.id)) {
-            if (client) client.log(`Duplicate transaction ${tx.id}.`);
-            return false;
-          } else if (tx.sig === undefined) {
-            if (client) client.log(`Unsigned transaction ${tx.id}.`);
-            return false;
-          } else if (!tx.validSignature()) {
-            if (client) client.log(`Invalid signature for transaction ${tx.id}.`);
-            return false;
-          } else if ((tx.txType === Transaction.NORMAL_TX || tx.txType === Transaction.TRADING_PROPERTY) && !tx.sufficientFunds(this)) {
-            if (client) client.log(`Insufficient gold for transaction ${tx.id}.`);
-            return false;
-          } else if (tx.txType === Transaction.OWNERSHIP_REGISTRY) {
-            // check if the property has been claimed
-              if (!tx.alreadyClaimedProperty(this, tx.data.propertyId)) {
-                client.log(`The property ${tx.data.propertyId} is already claimed by someone.`);
-                return false
-              }
-              // check if the property really exists
-              if (!existInList(tx.data.propertyId)) {
-                client.log(`The property ${tx.data.propertyId} doesn't exist.`);
-                return false 
-              }             
-          } else if (tx.txType === Transaction.TRADING_PROPERTY){
-              let c = new TradingContract(this)
-              if (!c.transferOwnership(tx.outputs[0].address, tx.data.propertyId)){
-                console.log(`Something is wrong with this trading.`)
-                return false
-              }           
-          }
+      if (this.transactions.get(tx.id)) {
+        if (client) client.log(`Duplicate transaction ${tx.id}.`);
+        return false;
+      } else if (tx.sig === undefined) {
+        if (client) client.log(`Unsigned transaction ${tx.id}.`);
+        return false;
+      } else if (!tx.validSignature()) {
+        if (client) client.log(`Invalid signature for transaction ${tx.id}.`);
+        return false;
+      } else if (tx.txType === Transaction.NORMAL_TX && !tx.sufficientFunds(this)) {
+        if (client) client.log(`Insufficient gold for transaction ${tx.id}.`);
+        return false;
+      } else if (tx.txType === Transaction.OWNERSHIP_REGISTRY) {
+          let r = new RegisterOwnership(this, tx.data.propertyId)
+          if(!r.validToRegister()) return false        
+      } else if (tx.txType === Transaction.TRADING_PROPERTY){
+          let c = new TradingContract(this, tx.outputs[0].address, tx.outputs[0].amount, tx.data.propertyId, tx.sufficientFunds(this))
+          if (!c.transferOwnership()){ 
+            return false   
+          }         
+      }
 
           // Checking and updating nonce value.
           // This portion prevents replay attacks.

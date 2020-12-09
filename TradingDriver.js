@@ -158,7 +158,6 @@ setTimeout(() => {
   console.log();
   console.log("Final properties (Alice's perspective):");
   showProperties(alice);
-  alice.showAllProperties();
 
   console.log();
   console.log("Final properties (Donald's perspective):");
@@ -167,8 +166,8 @@ setTimeout(() => {
   
   console.log();
 
-  // alice.showWallet();
-  // bob.showWallet();
+  alice.showWallet();
+  bob.showWallet();
   // console.log(alice.lastBlock.balances);
   // console.log(alice);
   

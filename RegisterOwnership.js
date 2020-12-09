@@ -1,26 +1,29 @@
-// 	To verify the registry: (bitcoin script, OP_RETURN)
-// 	verify signature
-// 	check if the property has been claimed by anyone 
-// 	check if the property really exists 
-// 	if all valid, add it to the block
 const data = require('./PropertiesIDLists.json')
 
-function verifyRegistration(propertyId){
-
-    // check if the property really exists
-    let inList = false;
-    data.forEach((d) => {       
-        if (d.propertyId === propertyId) {
-            console.log("found the property "  + d.propertyId);
-            inList = true;
-        }
-    })
-
-    if(!inList){
-        //  throw "Not exist"
-        return false;
+module.exports = class RegisterOwnership{
+    constructor(block, propertyId){
+        this.block = block
+        this.properties = block.properties
+        this.propertyId = propertyId
     }
-    return true;
+    validToRegister(){
+        // check if the property has been claimed
+        if(this.properties.get(this.propertyId)){
+            console.log(`${this.propertyId} is already been claimed by someone.`);
+            return false;
+        } 
+        // check if the property really exists
+        let inList = false;
+        data.forEach((d) => {       
+            if (d.propertyId === this.propertyId) {
+                console.log("found the property "  + d.propertyId);
+                inList = true;
+            }
+        })
+        if(!inList){
+            console.log(`${this.propertyId} doesn't exist.`)
+            return false;
+        }
+        return true;
+    }
 }
-
-module.exports = verifyRegistration;
