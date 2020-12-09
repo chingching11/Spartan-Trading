@@ -16,5 +16,11 @@
         "longitude": 96.199,
         "physicalAddr": "66 Sint Oo Dan Street",
         "price": 1000
+    },
+    {
+        "latitude": 35.9078,
+        "longitude": 127.7669,
+        "physicalAddr": "Sleepy Street",
+        "price": 350
     }
 ]

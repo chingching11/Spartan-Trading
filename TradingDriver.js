@@ -97,7 +97,7 @@ alice.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: h4.hashID
 
 // Charlie buying Bob's h1
 console.log(`Charlie buying Bob's property, ${h1.hashID}`);
-charlie.postTransaction(Transaction.TRADING_PROPERTY, [{ amount: h1.price, address: bob.address }], {propertyId: h1.hashID, price: h1.price, buyer:bob})
+charlie.postTransaction(Transaction.TRADING_PROPERTY, [{ amount: h1.price, address: bob.address }], {propertyId: h1.hashID, price: h1.price})
 
 // Bad Guy registering Alice's property
 console.log(`Bad Guy registering ownership, ${h3.hashID} `);
