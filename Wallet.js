@@ -1,20 +1,28 @@
 "use strict";
-// -	address
-// -	balance
-// -	property if owned any
-// -	transaction history
-const Client = require("./SpartanClient")
+const {Blockchain} = require('spartan-gold')
+
 
 module.exports = class Wallet{
 
     // assets map (type: value) ex: type balance, property
-    constructor(address, keyPair, client){
-        this.client = client
+    constructor(address, keyPair){
         this.keyPair = keyPair
         this.address = address
         this.balance = 0
         this.assets = []
-        this.activity = []
+        // this.activity = new Map()
+        // this.history = new Map()
+
+        // this.on(Blockchain.PROOF_FOUND, this.blockFound);
+    }
+
+    blockFound(block){
+        for(let [id, type] of block.transactions){
+            if(this.activity.get(id)){
+                this.history.set(id, type.txType)
+            } 
+        }
+        this.activity = new Map()
     }
 
     showAccInfo(block){
@@ -25,9 +33,13 @@ module.exports = class Wallet{
             }      
         }
         console.log(`Account address: ${this.address}`);
-        console.log(`   balance: ${this.balance} gold`);
-        console.log(`   assets: ${this.assets.length>0 ? this.assets: "none"}`);
-         
+        console.log(`\tbalance: ${this.balance} gold`);
+        console.log(`\tassets: ${this.assets.length>0 ? this.assets: "none"}`);
+        // console.log(`\tactivity:`) 
+        // for(let [id, type] of this.history){
+        //     console.log(`\t\t ${id} : ${type}`);
+        // }
+        
     }
 
     setGenesisBlock(block){

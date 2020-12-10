@@ -45,14 +45,5 @@ module.exports = class SpartanTransaction extends Transaction {
     typeOfTx(){
         return this.txType;
     }
-
-    // alreadyClaimedProperty(block, propertyId) {
-    //   if(block.properties.get(propertyId)){
-    //     return false;
-    //   } 
-    //   return true;
-    // }
-
-    
-    
+  
 }
