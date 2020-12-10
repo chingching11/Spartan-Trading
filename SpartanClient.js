@@ -1,5 +1,6 @@
 "use strict";
-const { Client, Blockchain } = require("spartan-gold");
+const { Client, Blockchain, utils } = require("spartan-gold");
+const Wallet = require("./Wallet");
 
 const OWNERSHIP_REGISTRY = "reigster_ownership"
 const TRADING_PROPERTY = "trading_property"
@@ -9,41 +10,14 @@ module.exports = class SpartanClient extends Client {
 
     constructor(...args){
         super(...args);
-        this.wallet = {}
-        this.wallet.account = this.address
-        this.wallet.activity = []
-        this.wallet.balance = 0
-        this.wallet.property = []
+        this.wallet = new Wallet(this.address, this.keyPair)
         
     }
-    
-    getProperty(){
-        let p= []
-        for (let [property, id] of this.lastConfirmedBlock.properties) {
-            if (id === this.address){
-                p.push(property)
-            }      
-        }
-        return p
+     
+    showWalletAccount(){
+        this.log("Showing the Client's wallet")
+        this.wallet.showAccInfo(this.lastConfirmedBlock)       
     }
-    // -	address
-    // -	balance
-    // -	property if owned any
-    // -	transaction history
-
-    showWallet(){    
-        this.log("Showing the client's wallet: ")
-        this.wallet.balance = this.confirmedBalance
-        this.wallet.property = this.getProperty()     
-        console.log(`Your account address is ${this.wallet.account}`);
-        console.log(`Your balance ${this.wallet.balance} gold`);
-        if(this.wallet.property.length>0){
-            console.log(`You owned ${this.wallet.property}`);
-        }
-        console.log(`Your transaction history: ${this.wallet.activity}`);
-        // console.log(this.wallet);
-    }
-
 
     /** 
      * Utility method that displays all confimed properties for all clients,
@@ -55,7 +29,6 @@ module.exports = class SpartanClient extends Client {
             console.log(`    ${id}: ${property}`);
         }
     }
-
 
     postTransaction(txType, outputs, data={}, fee=Blockchain.DEFAULT_TX_FEE) {
         // We calculate the total value of gold needed.
@@ -72,15 +45,15 @@ module.exports = class SpartanClient extends Client {
         // Broadcasting the new transaction.
         let tx = Blockchain.makeTransaction({
             txType: txType,
-            from: this.address,
+            from: this.wallet.address,
             nonce: this.nonce,
-            pubKey: this.keyPair.public,
+            pubKey: this.wallet.keyPair.public,
             outputs: outputs,
             fee: fee,
             data: data
         });
         
-        tx.sign(this.keyPair.private);
+        tx.sign(this.wallet.keyPair.private);
     
         // Adding transaction to pending.
         this.pendingOutgoingTransactions.set(tx.id, tx);
@@ -88,8 +61,7 @@ module.exports = class SpartanClient extends Client {
         this.nonce++;
     
         this.net.broadcast(Blockchain.POST_TRANSACTION, tx);
-        this.wallet.activity.push(tx.txType)
-    
+        
         return tx;
       }
     

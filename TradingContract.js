@@ -27,23 +27,23 @@ module.exports = class TradingContract{
     }
 
     // get 'to' from tx.outputs
-    transferOwnership(){
+    transferOwnership(client){
         // check if the property is registered
         if(!this.properties.get(this.propertyId)){
-            console.log("hey not registered");
+            client.log("hey not registered");
             // throw "hey not registered"
             return false 
         }
         // check if the owner is the same 
         if(this.properties.get(this.propertyId) !== this.owner){
-            console.log("owner not same")
+            client.log("owner not same")
             // throw "owner not same"
             return false
         }
 
         // check if the price is the same
         if(this.prices.get(this.propertyId) !== this.price){
-            console.log("price not the same")
+            client.log("price not the same")
             // throw "price not same"
             return false
         }
@@ -51,7 +51,7 @@ module.exports = class TradingContract{
         // check if the buyer has enough gold to buy 
         if(this.sufficientFund === false){
             // throw "not enough money"
-            console.log("The buyer doen't have enough to buy")
+            client.log("The buyer doen't have enough to buy")
             return false
         }
 

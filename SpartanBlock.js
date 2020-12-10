@@ -64,10 +64,10 @@ module.exports = class SpartanBlock extends Block {
         return false;
       } else if (tx.txType === Transaction.OWNERSHIP_REGISTRY) {
           let r = new RegisterOwnership(this, tx.data.propertyId)
-          if(!r.validToRegister()) return false        
+          if(!r.validToRegister(client)) return false        
       } else if (tx.txType === Transaction.TRADING_PROPERTY){
           let c = new TradingContract(this, tx.outputs[0].address, tx.outputs[0].amount, tx.data.propertyId, tx.sufficientFunds(this))
-          if (!c.transferOwnership()){ 
+          if (!c.transferOwnership(client)){ 
             return false   
           }         
       }
@@ -99,6 +99,8 @@ module.exports = class SpartanBlock extends Block {
                 let oldBalance = this.balanceOf(address);
                 this.balances.set(address, amount + oldBalance);
             });
+
+            // tx.fromWallet.activity.set(tx.id, "normal tx")
           } 
           if(tx.txType === Transaction.OWNERSHIP_REGISTRY || tx.txType === Transaction.TRADING_PROPERTY) {
               this.properties.set(tx.data.propertyId, tx.from);

@@ -166,17 +166,13 @@ setTimeout(() => {
   
   console.log();
 
-  alice.showWallet();
-  bob.showWallet();
-  // console.log(alice.lastBlock.balances);
-  // console.log(alice);
-  
-  // console.log();
-  // bob.showWallet();
-  // console.log();
-  // charlie.showWallet();
-  // badBuyer.showWallet();
-
+  alice.showWalletAccount();
+  console.log();
+  bob.showWalletAccount();
+  console.log();
+  charlie.showWalletAccount();
+  console.log();
+  badBuyer.showWalletAccount();
   
   process.exit(0);
 }, 5000);
