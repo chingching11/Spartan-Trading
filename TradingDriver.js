@@ -174,8 +174,9 @@ setTimeout(() => {
   charlie.showWalletAccount();
   console.log();
   badBuyer.showWalletAccount();
-  
-  
+  console.log();
+  minnie.showWalletAccount();
+    
   process.exit(0);
 }, 5000);
 
