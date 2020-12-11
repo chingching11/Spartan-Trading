@@ -4,8 +4,9 @@ const { Blockchain, FakeNet } = require("spartan-gold");
 let Block = require('./SpartanBlock.js');
 let Client = require('./SpartanClient.js');
 let Transaction = require('./SpartanTransaction.js');
-let House = require('./House.js');
 let Miner = require('./SpartanMiner')
+let House = require('./House.js');
+
 
 console.log("Starting simulation.  This may take a moment...");
 
@@ -14,10 +15,9 @@ let fakeNet = new FakeNet();
 
 // Clients
 let alice = new Client({name: "Alice", net: fakeNet});
-
 let bob = new Client({name: "Bob", net: fakeNet});
 let charlie = new Client({name: "Charlie", net: fakeNet});
-let badBuyer = new Client({name: "Bad Guy", net: fakeNet});
+let badGuy = new Client({name: "Bad Guy", net: fakeNet});
 
 // Miners
 let minnie = new Miner({name: "Minnie", net: fakeNet});
@@ -31,7 +31,7 @@ let genesis = Blockchain.makeGenesis({
     [alice, 233],
     [bob, 99],
     [charlie, 600],
-    [badBuyer, 100],
+    [badGuy, 100],
     [minnie, 400],
     [mickey, 300],
   ]),
@@ -45,7 +45,7 @@ function showBalances(client) {
   console.log(`Alice has ${client.lastBlock.balanceOf(alice.wallet.address)} gold.`);
   console.log(`Bob has ${client.lastBlock.balanceOf(bob.wallet.address)} gold.`);
   console.log(`Charlie has ${client.lastBlock.balanceOf(charlie.wallet.address)} gold.`);
-  console.log(`Bad Buyer has ${client.lastBlock.balanceOf(badBuyer.wallet.address)} gold.`);
+  console.log(`Bad Buyer has ${client.lastBlock.balanceOf(badGuy.wallet.address)} gold.`);
   console.log(`Minnie has ${client.lastBlock.balanceOf(minnie.wallet.address)} gold.`);
   console.log(`Mickey has ${client.lastBlock.balanceOf(mickey.wallet.address)} gold.`);
   console.log(`Donald has ${client.lastBlock.balanceOf(donald.wallet.address)} gold.`);
@@ -54,7 +54,7 @@ function showProperties(client) {
     console.log(`Alice has ${client.lastBlock.ownerOf(alice.wallet.address)}`);
     console.log(`Bob has ${client.lastBlock.ownerOf(bob.wallet.address)}`);
     console.log(`Charlie has ${client.lastBlock.ownerOf(charlie.wallet.address)}`);
-    console.log(`Bad Buyer has ${client.lastBlock.ownerOf(badBuyer.wallet.address)}`);
+    console.log(`Bad Buyer has ${client.lastBlock.ownerOf(badGuy.wallet.address)}`);
     console.log(`Minnie has ${client.lastBlock.ownerOf(minnie.wallet.address)}`);
     console.log(`Mickey has ${client.lastBlock.ownerOf(mickey.wallet.address)}`);
     console.log(`Donald has ${client.lastBlock.ownerOf(donald.wallet.address)}`);
@@ -101,24 +101,24 @@ charlie.postTransaction(Transaction.TRADING_PROPERTY, [{ amount: h1.price, addre
 
 // Bad Guy registering Alice's property
 console.log(`Bad Guy registering ownership, ${h3.hashID} `);
-badBuyer.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: h3.hashID , price: h3.hashID})
+badGuy.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: h3.hashID , price: h3.hashID})
 
 // Bad Guy registering non-existent property
-console.log(`Bad Guy registering on-existent property`);
-badBuyer.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: "ace45b03e82849e2dfe368ba4c2c6c3fb89d4eca0602f7bd0a010229563e9539",price:10000})
+console.log(`Bad Guy registering non-existent property`);
+badGuy.postTransaction(Transaction.OWNERSHIP_REGISTRY, [], {propertyId: "ace45b03e82849e2dfe368ba4c2c6c3fb89d4eca0602f7bd0a010229563e9539",price:10000})
 
 // Bad Guy buying Alice property, with not sufficient fund
 console.log(`Bad Guy buying Alice's property with not sufficient fund, ${h2.hashID}`);
-badBuyer.postTransaction(Transaction.TRADING_PROPERTY, [{ amount: h2.price, address: alice.wallet.address }], {propertyId: h2.hashID, price: h2.price})
+badGuy.postTransaction(Transaction.TRADING_PROPERTY, [{ amount: h2.price, address: alice.wallet.address }], {propertyId: h2.hashID, price: h2.price})
 
 
 // Bad Guy buying Alice property, with differnt price
 console.log(`Bad Guy buying Alice's property with differnt price, ${h2.hashID}`);
-badBuyer.postTransaction(Transaction.TRADING_PROPERTY, [{ amount: 10, address: alice.wallet.address }], {propertyId: h2.hashID, price: h2.price})
+badGuy.postTransaction(Transaction.TRADING_PROPERTY, [{ amount: 10, address: alice.wallet.address }], {propertyId: h2.hashID, price: h2.price})
 
 // Bad Guy buying unregistered property
 console.log(`Bad Guy buying unregistered property`);
-badBuyer.postTransaction(Transaction.TRADING_PROPERTY, [{ amount: h3.price, address: alice.wallet.address }], {propertyId: "ace45b03e82849e2dfe368ba4c2c6c3fb89d4eca0602f7bd0a010229563e9539", price:80})
+badGuy.postTransaction(Transaction.TRADING_PROPERTY, [{ amount: h3.price, address: alice.wallet.address }], {propertyId: "ace45b03e82849e2dfe368ba4c2c6c3fb89d4eca0602f7bd0a010229563e9539", price:80})
 
 setTimeout(() => {
   console.log();
@@ -173,7 +173,7 @@ setTimeout(() => {
   console.log();
   charlie.showWalletAccount();
   console.log();
-  badBuyer.showWalletAccount();
+  badGuy.showWalletAccount();
   console.log();
   minnie.showWalletAccount();
     
