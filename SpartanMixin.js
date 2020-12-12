@@ -14,6 +14,10 @@ module.exports = {
         this.wallet.showAccInfo(this.lastConfirmedBlock)       
     }, 
 
+    getWallet: function(){
+      return this.wallet.getWalletInfo(this.lastConfirmedBlock)
+    },
+
     /** 
         * Utility method that displays all confimed properties for all clients,
         * according to the client's own perspective of the network.
@@ -54,12 +58,8 @@ module.exports = {
     
         this.nonce++;
 
+        this.net.broadcast(Blockchain.POST_TRANSACTION, tx);    
         
-        this.net.broadcast(Blockchain.POST_TRANSACTION, tx);
-        // this.wallet.activity.set(tx.id, txType)
-    
         return tx;
       },
-
-      
 }
