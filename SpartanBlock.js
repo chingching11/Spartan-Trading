@@ -88,10 +88,7 @@ module.exports = class SpartanBlock extends Block {
 
           // Adding the transaction to the block
           this.transactions.set(tx.id, tx);
-          // tx.fromWalletActivity.push(tx.txType)
-          // console.log(tx)
-          // console.log(tx.fromWalletActivity);
-          // throw "stop"
+          
           if(tx.txType === Transaction.NORMAL_TX || tx.txType === Transaction.TRADING_PROPERTY){
             // Taking gold from the sender
             let senderBalance = this.balanceOf(tx.from);

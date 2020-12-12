@@ -1,0 +1,40 @@
+<% include('header'); %> 
+<h1>Client Page</h1>
+<h2> Hello <%= clientName %>  </h2>
+<div>
+    <h3>Transfer Gold </h3>
+    <form action="/<%= clientName %>/send" method="POST">
+        <label>Amount:</label>
+        <input type="text" name="amount"><br>
+        <label>Address:</label>
+        <input type="text" name="address"><br>
+        <button type="submit"> Send </button>
+    </form>
+</div>
+<div>
+    <h3>Register Ownership</h3>
+    <form action="/<%= clientName %>/register" method="POST">
+        <label>Property Id:</label>
+        <input type="text" name="propertyId"><br>
+        <label>Price:</label>
+        <input type="text" name="price"><br>
+        <button type="submit"> Register </button>
+    </form>
+</div>
+<div>
+    <h3>Buy a Property </h3>
+    <form action="/<%= clientName %>/buy" method="POST">
+        <label>Property Id:</label>
+        <input type="text" name="propertyId"><br>
+        <button type="submit"> Buy </button>
+    </form>
+</div>
+<div>
+    <h3>Wallet</h3>
+    <p> Account address: <%= wallet.address %> </p>
+    <p> Balance: <%= wallet.balance %>  </p>
+    <p> Assets: </p> 
+    <% for( let [id, price] of wallet.assets ) { %>
+        <p> <%= id %> : <%= price %>  </p>
+    <% } %>   
+</div>
