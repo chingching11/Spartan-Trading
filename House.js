@@ -5,10 +5,10 @@ module.exports = class House {
 
     /**
      * 
-     * @param {Float} geoCoordinates - the geo corrdinates of the house
+     * @param {Float} latitude - latitude of the house
+     * @param {Float} longitude - longitude of the house
      * @param {String} physicalAddr - physical address of the house
      * @param {Float} price - price at which seller wants to sells the house 
-     * @param {String} ownerAddr - address of the owner 
      */
     constructor({latitude, longitude,  physicalAddr, price}){
         this.latitude = latitude
@@ -25,25 +25,7 @@ module.exports = class House {
             latitude: this.latitude,
             longitude: this.longitude,
             physicalAddr: this.physicalAddr,
-            price: this.price,
-            // ownerAddr: this.ownerAddr
         }));
     }
 
-
-    /**
-     * 
-     * @param privKey - client's private key to sign the house id 
-     */
-    sign(privKey){
-        this.signature = utils.sign(privKey, this.hashID)
-    }
-
-    /**
-     * verifySignature, check if the property exists, check it's been claimed by anyone 
-     */
-    validOwnership(){
-
-    }
-    
 }

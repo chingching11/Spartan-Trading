@@ -5,7 +5,6 @@ const OWNERSHIP_REGISTRY = "reigster_ownership"
 const TRADING_PROPERTY = "trading_property"
 const NORMAL_TX = "sending_spartanGold_money"
 
-// to accept property registry as a type of transaction
 
 module.exports = class SpartanTransaction extends Transaction {
     
@@ -16,15 +15,18 @@ module.exports = class SpartanTransaction extends Transaction {
   static get NORMAL_TX() { return NORMAL_TX }
 
 /**
-   * There can be 3 types of outputs depending on 3 types of transactions
+   * 3 types of transactions:
    * for normal tx: 
-   *    the outputs can be array, meaning that one transaction can pay multiple parties. 
-   *    An output is a pair of an amount of gold and the hash of a public key (also called the address),
-   *    in the form: {amount, address}
+   *    outputs = can be array, meaning that one transaction can pay multiple parties. 
+   *      An output is a pair of an amount of gold and the hash of a public key (also called the address),
+   *      in the form: {amount, address}
+   *    data = empty obj
    * for ownership registry:
-   *    outputs: {propertyId, address}
-   * for property trading:
-   *    outputs: {propertyId, address}
+   *    outputs = empty array
+   *    data = {propertyId, address}
+   * for property trading: 
+   *    outputs = same as normal tx
+   *    data = {propertyId, address}
    * @constructor
    * @param {Object} obj - The inputs and outputs of the transaction.
    * @param obj.txType - The type of transaction
@@ -42,6 +44,9 @@ module.exports = class SpartanTransaction extends Transaction {
         this.txType = txType;
       }
 
+    /**
+     * @returns {String} - type of transaction
+     */
     typeOfTx(){
         return this.txType;
     }

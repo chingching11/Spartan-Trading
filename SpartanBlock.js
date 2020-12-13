@@ -5,14 +5,9 @@ const Transaction = require ("./SpartanTransaction")
 const TradingContract = require("./TradingContract")
 
 module.exports = class SpartanBlock extends Block {
-
-    // modify addTx: in check conditions
-    // also check: if validOwnership 
-
-    
-    /**
-   * Creates a new Block.  Note that the previous block will not be stored;
-   * instead, its hash value will be maintained in this block.
+ 
+  /**
+   * Accepts 3 types of transactions. Each block has balance map, properties map and prices map.
    * 
    * @constructor
    * @param {String} rewardAddr - The address to receive all mining rewards for this block.
@@ -30,8 +25,10 @@ module.exports = class SpartanBlock extends Block {
 
     }
 
-
-
+    /**
+     * Returns the client's owned properties.
+     * @param {String} addr - client's address 
+     */
     ownerOf(addr){
       let r = []
       for (let [property, id] of this.properties) {
@@ -43,10 +40,10 @@ module.exports = class SpartanBlock extends Block {
     }
     /**
      * Accepts 3 types of tx: normal tx, register ownership, trading 
-     * @param {*} tx 
-     * @param {*} client 
+     * @param {SpartanTransaction} tx 
+     * @param {SpartanClient} client 
      * 
-     * @returns {Boolean}
+     * @returns {Boolean} - whether the transaction is valid to add into the block
      */
  
     addTransaction(tx, client){
@@ -72,39 +69,39 @@ module.exports = class SpartanBlock extends Block {
           }         
       }
 
-          // Checking and updating nonce value.
-          // This portion prevents replay attacks.
-          let nonce = this.nextNonce.get(tx.from) || 0;
-          if (tx.nonce < nonce) {
-            if (client) client.log(`Replayed transaction ${tx.id}.`);
-            return false;
-          } else if (tx.nonce > nonce) {
-            // FIXME: Need to do something to handle this case more gracefully.
-            if (client) client.log(`Out of order transaction ${tx.id}.`);
-            return false;
-          } else {
-            this.nextNonce.set(tx.from, nonce + 1);
-          }
+        // Checking and updating nonce value.
+        // This portion prevents replay attacks.
+        let nonce = this.nextNonce.get(tx.from) || 0;
+        if (tx.nonce < nonce) {
+          if (client) client.log(`Replayed transaction ${tx.id}.`);
+          return false;
+        } else if (tx.nonce > nonce) {
+          // FIXME: Need to do something to handle this case more gracefully.
+          if (client) client.log(`Out of order transaction ${tx.id}.`);
+          return false;
+        } else {
+          this.nextNonce.set(tx.from, nonce + 1);
+        }
 
-          // Adding the transaction to the block
-          this.transactions.set(tx.id, tx);
-          
-          if(tx.txType === Transaction.NORMAL_TX || tx.txType === Transaction.TRADING_PROPERTY){
-            // Taking gold from the sender
-            let senderBalance = this.balanceOf(tx.from);
-            this.balances.set(tx.from, senderBalance - tx.totalOutput());
+        // Adding the transaction to the block
+        this.transactions.set(tx.id, tx);
         
-            // Giving gold to the specified output addresses
-            tx.outputs.forEach(({amount, address}) => {
-                let oldBalance = this.balanceOf(address);
-                this.balances.set(address, amount + oldBalance);
-            });
-          } 
-          if(tx.txType === Transaction.OWNERSHIP_REGISTRY || tx.txType === Transaction.TRADING_PROPERTY) {
-              this.properties.set(tx.data.propertyId, tx.from);
-              this.prices.set(tx.data.propertyId, tx.data.price)
-          }
-          return true;
+        if(tx.txType === Transaction.NORMAL_TX || tx.txType === Transaction.TRADING_PROPERTY){
+          // Taking gold from the sender
+          let senderBalance = this.balanceOf(tx.from);
+          this.balances.set(tx.from, senderBalance - tx.totalOutput());
+      
+          // Giving gold to the specified output addresses
+          tx.outputs.forEach(({amount, address}) => {
+              let oldBalance = this.balanceOf(address);
+              this.balances.set(address, amount + oldBalance);
+          });
+        } 
+        if(tx.txType === Transaction.OWNERSHIP_REGISTRY || tx.txType === Transaction.TRADING_PROPERTY) {
+            this.properties.set(tx.data.propertyId, tx.from);
+            this.prices.set(tx.data.propertyId, tx.data.price)
+        }
+        return true;
     }
 
     rerun(prevBlock) {

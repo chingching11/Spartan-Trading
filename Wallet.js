@@ -1,7 +1,14 @@
 "use strict";
 
+/**
+ * A wallet has client's keys, address, gold balance and assets if he or she owned any property
+ */
 module.exports = class Wallet{
 
+    /**
+     * @param {String} address - client's address calculated from public key
+     * @param {Oject} keyPair - client's generated keyPair from utils
+     */
     constructor(address, keyPair){
         this.keyPair = keyPair
         this.address = address
@@ -9,6 +16,10 @@ module.exports = class Wallet{
         this.assets = new Map()
     }
 
+    /**
+     * Get the client's balance and assets info from the last confirmed block.
+     * @param {SpartanBlock} block - last confirmed block from the blockchain
+     */
     getWalletInfo(block){
         this.balance = block.balanceOf(this.address);
         this.assets = new Map()
@@ -20,6 +31,10 @@ module.exports = class Wallet{
         return this
     }
 
+    /**
+     * Conosle log the client's wallet info.
+     * @param {SpartanBlock} block - last confirmed block from the blockchain
+     */
     showAccInfo(block){
         this.balance = block.balanceOf(this.address);
         this.assets = new Map()

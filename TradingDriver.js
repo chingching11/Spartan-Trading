@@ -1,5 +1,7 @@
 "use strict";
 
+// Updated version of spartan-gold driver 
+
 const { Blockchain, FakeNet } = require("spartan-gold");
 let Block = require('./SpartanBlock.js');
 let Client = require('./SpartanClient.js');

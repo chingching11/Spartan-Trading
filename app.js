@@ -47,10 +47,12 @@ app.get('/', (req, res) => {
     res.json(data)
 })
 
+// alice page
 app.get('/alice', (req, res) => {
     res.render('client', {clientName: "alice", wallet: alice.getWallet()})
 })
 
+// alice tranfer money
 app.post('/alice/send', (req, res, next) => {
   let amount = parseInt(req.body.amount, 10)
   let address = req.body.address
@@ -58,6 +60,7 @@ app.post('/alice/send', (req, res, next) => {
   res.redirect('/alice')
 })
 
+// alice register ownership
 app.post('/alice/register', (req, res, next) => {
   let price = parseInt(req.body.price, 10)
   let propertyId = req.body.propertyId
@@ -65,6 +68,7 @@ app.post('/alice/register', (req, res, next) => {
   res.redirect('/alice')
 })
 
+// alice buying 
 app.post('/alice/buy', (req, res, next) => {
   let propertyId = req.body.propertyId
   let block = alice.lastConfirmedBlock
@@ -74,10 +78,12 @@ app.post('/alice/buy', (req, res, next) => {
   res.redirect('/alice')
 })
 
+//bob page
 app.get('/bob', (req, res) => {
   res.render('client', {clientName: "bob", wallet: bob.getWallet()})
 })
 
+//bob transfer money
 app.post('/bob/send', (req, res, next) => {
   let amount = parseInt(req.body.amount, 10)
   let address = req.body.address
@@ -85,6 +91,7 @@ app.post('/bob/send', (req, res, next) => {
   res.redirect('/bob')
 })
 
+//bob register ownership
 app.post('/bob/register', (req, res, next) => {
   let price = parseInt(req.body.price, 10)
   let propertyId = req.body.propertyId
@@ -92,6 +99,7 @@ app.post('/bob/register', (req, res, next) => {
   res.redirect('/bob')
 })
 
+//bob buying 
 app.post('/bob/buy', (req, res, next) => {
   let propertyId = req.body.propertyId
   let block = alice.lastConfirmedBlock

@@ -1,15 +1,17 @@
-const House = require("./House")
-const Block = require("./SpartanBlock")
-const Transaction = require('./SpartanTransaction')
-
-// ownerOf(propertyId) --> return the owner address 
-
-// transferOwnerhip(from, to, propertyId ) 
-//  transfert ownerhip , to will give money, remove the values from the map of block, then update them as a transaction 
-
+/**
+ * Verify if the client can buy a property
+ */
 
 module.exports = class TradingContract{
 
+    /**
+     * 
+     * @param {SpartanBlock} block 
+     * @param {String} owner - owner's wallet address
+     * @param {Float} price - property's price
+     * @param {String} propertyId - property's hash id 
+     * @param {Boolean} sufficientFund - buyer has enough gold to buy
+     */
     constructor(block, owner, price, propertyId, sufficientFund){
         this.block = block;
         this.properties = block.properties;
@@ -22,11 +24,21 @@ module.exports = class TradingContract{
         this.sufficientFund = sufficientFund
     }
 
+    /**
+     * 
+     * @param {String} propertyId 
+     * @returns {String} - owner address 
+     */
     ownerOf(propertyId){
         return this.properties.get(propertyId)
     }
 
-    // get 'to' from tx.outputs
+   /**
+    * Check if the trading transaction is valid.
+    * 
+    * @param {SpartanClient} client - Spartan Miner who's currently validating the tx
+    * @returns {Boolean} - whether or not trading is valid
+    */
     transferOwnership(client){
         // check if the property is registered
         if(!this.properties.get(this.propertyId)){
@@ -41,7 +53,7 @@ module.exports = class TradingContract{
             return false
         }
 
-        // check if the price is the same
+        // check if buyer is paying the same price as the property's price
         if(this.prices.get(this.propertyId) !== this.price){
             client.log(`${this.propertyId} price not the same`)
             // throw "price not same"

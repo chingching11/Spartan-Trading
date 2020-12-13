@@ -1,3 +1,6 @@
+"use strict"
+//create property id from the PropertiesLists.json and push the ids to the PropertiesIDLists.json
+
 const fs = require('fs')
 const House = require('./House')
 const data = require('./PropertiesLists.json')

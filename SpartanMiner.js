@@ -11,7 +11,6 @@ module.exports = class SpartanMiner extends Miner {
 
     constructor(...args){
         super(...args);
-        this.txActivities = new Map();
         Object.assign(this, SpartanMixin);
         this.createWallet();
     }

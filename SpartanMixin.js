@@ -5,22 +5,31 @@ const Transaction = require('./SpartanTransaction')
 
 module.exports = {
 
+    /**
+     * create a wallet using the client's address
+     */
     createWallet: function(){
         this.wallet = new Wallet(this.address, this.keyPair)
     },
 
+    /**
+     * console log the client's wallet info
+     */
     showWalletAccount: function(){
         this.log("Showing the Client's wallet")
         this.wallet.showAccInfo(this.lastConfirmedBlock)       
     }, 
 
+    /**
+     * get the client's wallet info
+     */
     getWallet: function(){
       return this.wallet.getWalletInfo(this.lastConfirmedBlock)
     },
 
     /** 
-        * Utility method that displays all confimed properties for all clients,
-        * according to the client's own perspective of the network.
+     * displays all confimed properties for all clients,
+     * according to the client's own perspective of the network.
     */
    showAllProperties: function(){
     this.log("Showing properties: ");
@@ -29,6 +38,15 @@ module.exports = {
         }
     } , 
 
+    /**
+     * 
+     * @param {String} txType - transaction type 
+     * @param {Array} outputs - list of address and amounts to pay
+     * @param {Object} data - contains information about propertyId and property price
+     * @param {number} fee - transaction fees
+     * 
+     * @returns {SpartanTransaction} - broadcasted transaction
+     */
     postTransaction: function(txType, outputs, data={}, fee=Blockchain.DEFAULT_TX_FEE) {
         // We calculate the total value of gold needed.
         if(txType === Transaction.NORMAL_TX){
