@@ -1,7 +1,7 @@
 # Spartan-Trading
 
 ## Introduction 
-Spartan Trading is a decentralized application for buying and selling properties using the [spartan-gold blockchain](https://github.com/taustin/spartan-gold.git) and its currency (gold). In addition to money transaction, it can accept 2 more additional transactions: register property ownership and trading (buying the registered property). Each client will have a wallet, and the process of transaction will use the wallet address. The implementation ideas of this project are based on the concept of [ERC721] Non-Fungible Token standard (https://eips.ethereum.org/EIPS/eip-721). 3 main features: register ownership, trading, wallet. 
+Spartan Trading is a decentralized application for buying and selling properties using the [spartan-gold blockchain](https://github.com/taustin/spartan-gold.git) and its currency (gold). In addition to money transaction, it can accept 2 more additional transactions: register property ownership and trading (buying the registered property). Each client will have a wallet, and the process of transaction will use the wallet address. The implementation ideas of this project are based on the concept of [ERC721](https://eips.ethereum.org/EIPS/eip-721) Non-Fungible Token standard. 3 main features: register ownership, trading, wallet. 
 
 ## Logic
 To sell a property, the seller has to register ownership first, and the registered information will be recorded in the blockchain and the buyer can only buy the registered properties.
@@ -80,6 +80,6 @@ The Verification Rules for trading a property are as follows:
 
 ## Useful Information
 - [spartain-gold blockchain](https://github.com/taustin/spartan-gold)
-- [ERC721]((https://eips.ethereum.org/EIPS/eip-721))
+- [ERC721](https://eips.ethereum.org/EIPS/eip-721)
 
 
